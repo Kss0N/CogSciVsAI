@@ -3,7 +3,7 @@
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'ai' | 'system';
   content: string;
   timestamp: Date;
 }
