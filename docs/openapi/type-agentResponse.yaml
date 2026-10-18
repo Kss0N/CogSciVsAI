@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: Agent Chat API
+  version: 1.0.0
+paths: {} # Paths are required by OpenAPI, but can be empty for data modeling
+
+components:
+  schemas:
+
+  AgentResponse:
+      type: object
+      required:
+        - response
+      properties:
+        response:
+          type: string
+        tool_calls:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - args
+            properties:
+              name:
+                type: string
+              args:
+                type: object
+                additionalProperties: true # Maps to Record<string, unknown>

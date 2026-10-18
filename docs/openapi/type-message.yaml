@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: Agent Chat API
+  version: 1.0.0
+paths: {} # Paths are required by OpenAPI, but can be empty for data modeling
+
+
+components:
+  schemas:
+
+    Message:
+      type: object
+      required:
+        - id
+        - role
+        - content
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid # Or just 'type: string' if it's not a UUID
+        role:
+          type: string
+          enum:
+            - user
+            - assistant
+            - system
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    
+
+    

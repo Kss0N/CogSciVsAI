@@ -1,0 +1,29 @@
+name: CogSciVsAI
+
+services:
+
+  app:
+    build: ./cogsci-app
+    container_name: cogsci-app
+    env_file:
+      - .env
+    expose: 
+      - "${API_PORT}" #Backend is only accessible to frontend container inside network.
+
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+
+  ui:
+    build: ./cogsci-ui
+    container_name: cogsci-ui
+    env_file:
+      - .env
+    ports:
+      - "${APP_PORT}:80"
+
+    depends_on:
+      - app
+
+  redis:
+    image: redis:alpine

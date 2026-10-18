@@ -1,10 +1,9 @@
-# syntax=docker/dockerfile:1
 
 # Build an image with the Python 3.13 image
 FROM python:3.13-slim-bookworm
 
-# Set the working directory to `/code`
-WORKDIR /code
+# Set the working directory to `/app`
+WORKDIR /app
 
 # Set environment variables used by the `flask` command
 ENV FLASK_APP=app.py
@@ -22,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 
 # Install the Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory `.` in the project to the workdir `.` in the image
 COPY . .
