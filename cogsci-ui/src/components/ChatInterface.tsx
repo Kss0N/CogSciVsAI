@@ -135,7 +135,7 @@ const ChatInterface = () => {
     <Container fluid className="chat-container d-flex flex-column vh-100 p-0">
       
       {/* Conversation Stack */}
-      <Stack gap={3}>
+      <Stack gap={2} className="pt-2">
         {messages.map((msg) => (
           <ChatBubble msg={msg}/>
         ))}
