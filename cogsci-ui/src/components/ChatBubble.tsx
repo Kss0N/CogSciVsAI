@@ -23,6 +23,11 @@ export default function ChatBubble({msg} :{msg : Message}){
     "incoming": "secondary",
     "outgoing": "primary"
   }[role]
+  const bubbleRadius = {
+    system: '18px 18px 18px 18px',
+    incoming: '18px 18px 18px 2px',
+    outgoing: '18px 18px 2px 18px'
+  }[role]
 
   return(
     <div className={`d-flex align-items-end ${bubbleAlignment}`} key={msg.id}>
@@ -33,9 +38,10 @@ export default function ChatBubble({msg} :{msg : Message}){
           <div className="assistant-icon">✻</div>
         )}
       </div>
-      <div className={`background ${bubbleBackground}  flex-grow-1 justify-content-center`} style={{ borderRadius: '18px 18px 18px 18px', maxWidth: '60%' }}>
+      <div className={`background ${bubbleBackground}  flex-grow-1 justify-content-center`} style={{ borderRadius: bubbleRadius, maxWidth: '60%' }}>
         <pre className="mb-0 p-2">{msg.content}</pre>
       </div>
+      {role === "outgoing" && (<div className="me-4"></div>)}
     </div>   
   )
 }
