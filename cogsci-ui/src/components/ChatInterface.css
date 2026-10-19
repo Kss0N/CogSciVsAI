@@ -124,9 +124,15 @@
   border-radius: 6px;
   font-size: 13px;
 }
+.message-user {
+    color: #b4b4b4;
+    border-color:#4ade80
+}
 
-.message-user .message-content {
+.message-content {
   color: #b4b4b4;
+  background-color: #7aa2f7;
+  border-radius: 12px;
 }
 
 .thinking {

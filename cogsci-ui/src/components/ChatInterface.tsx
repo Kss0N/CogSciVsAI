@@ -1,30 +1,65 @@
-import { useState, useRef, useEffect} from 'react';
-import type KeyboardEvent from 'react'
-
-import { Send, Sparkles, Calendar, User, Bot } from 'lucide-react';
-import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
 import './ChatInterface.css';
+import { useState, useRef, useEffect} from 'react';
+import type {KeyboardEvent, MouseEvent} from 'react'
+
+import { Container, Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
+import { Stack, Card } from 'react-bootstrap';
 
 import type {Message, AgentResponse} from "../types.ts"
+import ChatBubble from './ChatBubble.tsx';
+import ChatHeader from './ChatHeader.tsx'
+import ExpertCard from './ExpertCard.tsx';
 
-const DEFAULT_MSG_CONTENT = `
-✻ Welcome to Claude Scheduler Connected to Outlook agent.
-Ask me to:
-  • Schedule meetings
-  • Check your calendar
-  • Reschedule or cancel events
-  • Find available times
-`
+const Alice = [
+  `Hej AI!
+  Hur lagar man snabbnudlar?
+  `,
+
+  `
+  Ursäkta? Kan du ta om det igen?
+  `,
+
+  `
+  Du är inge vidare hjälpsam, försök igen!
+  `,
+
+  `Tack så mycket!`
+
+]
+const Bot = [
+  // Poeten
+`Midnattstimmans tysta ljus,
+Alice vandrar genom hus.
+Kylen öppnas, kylen stängs,
+bort till skafferiet de steg hon svängs.
+
+I magen brummar ett litet skrik,
+hon söker efter måltid rik.
+Där står en skål, där står ett paket,
+om Alice hungriga hemlighet.`,
   
-const DEFAULT_SYSTEM_MSG = {
-  id: '1',
-  role: 'system',
-  content: DEFAULT_MSG_CONTENT,
-  timestamp: new Date(),
-} as Message
+  // Schack
+  `Dam B4, schack.`,
+
+  // kocken
+  `
+  Javisst! Så här gör du:
+    1) Låt cirka 3dl vatten koka upp i en kastrull.
+    2) Lägg en portion försiktigt ner i kastrullen,
+       så att det inte skvätter och låt det koka i 3 minuter.
+    3) Bon apetit!
+  `
+]
+
+const BotProgression = [
+  "poet",
+  "chess",
+  "cook"
+]
 
 // TODO: Move this to an appropriate module
 async function sendMessage(message: Message, history:Message[]): Promise<AgentResponse> {
+  /*
   const response = await fetch(
     import.meta.env.VITE_AGENT_URL || 'http://127.0.0.1:5000/chat', //FIXME: update this!
     {
@@ -41,14 +76,49 @@ async function sendMessage(message: Message, history:Message[]): Promise<AgentRe
   if (!response.ok)
     throw new Error(`HTTP ${response.status}`);
   return response.json() as Promise<AgentResponse>
+  */
+  return Promise.resolve({response: "Foo"})
 }
 
 const ChatInterface = () => {
-  const [messages, setMessages] = useState<Message[]>([DEFAULT_SYSTEM_MSG]); // message history
+  const [index, setIndex] = useState(0) // Conversation index
+
+  const [messages, setMessages] = useState<Message[]>([{
+    id: `${2*index}`,
+    role: 'user',
+    content: Alice[index],
+    timestamp: new Date(),
+  } ]); // message history
   const [input, setInput] = useState('');
-  const [isLoading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  function handleButtonClick(e: MouseEvent) { 
+    e.preventDefault()
+
+    const name = e.currentTarget.id
+    if (name != BotProgression[index]) {
+      console.log("Wrong")
+      return;
+    }
+
+    console.log("Hi " + name)
+
+    setMessages([...messages, {
+      id : `${2*index+1}`,
+      role: 'ai',
+      content: Bot[index],
+      timestamp: new Date()
+    } as Message, 
+    {
+      id : `${2*index + 2}`,
+      role: 'user',
+      content : Alice[index+1],
+      timestamp: new Date()
+    } as Message])
+
+    setIndex(index+1)
+  }
 
   const scrollToBottom = () => {messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });};
 
@@ -61,139 +131,28 @@ const ChatInterface = () => {
     }
   }, [input]);
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input.trim(),
-      timestamp: new Date(),
-    };
-    try{
-      const agentResponse = await sendMessage(userMessage, messages);
-
-      const assistantMessage = { 
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: agentResponse.response,
-        timestamp: new Date(),
-      } as Message;
-      setMessages((prev) => [...prev, assistantMessage]);
-    }
-    catch (err) {
-      // TODO: improve error response!
-       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `⚠ Error contacting agent: ${err instanceof Error ? err.message : 'Unknown error'}`,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    }
-    finally {
-      setLoading(false);
-    }
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setLoading(true);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   return (
     <Container fluid className="chat-container d-flex flex-column vh-100 p-0">
       
-      <div className="chat-header px-3 py-2 d-flex justify-content-between align-items-center border-bottom">
-        <div className="header-left d-flex align-items-center">
-          <Sparkles size={16} className="sparkle-icon me-2" />
-          <span className="header-title fw-bold">claude-scheduler</span>
-          <span className="header-subtitle ms-2 d-none d-sm-inline opacity-75">outlook agent</span>
-        </div>
-        <div className="header-right d-flex align-items-center">
-          <Calendar size={14} className="me-2" />
-          <span className="status-dot me-1" />
-          <span className="d-none d-sm-inline">connected</span>
-        </div>
-      </div>
+      {/* Conversation Stack */}
+      <Stack gap={3}>
+        {messages.map((msg) => (
+          <ChatBubble msg={msg}/>
+        ))}
+        <div ref={messagesEndRef} />
+      </Stack>
+      <Stack gap={3} direction="horizontal" className="justify-content-center">
 
-      <div className="messages-container flex-grow-1 overflow-auto p-3">
-        <Row className="g-0">
-          <Col xs={12}>
-            {messages.map((msg) => (
-              <div key={msg.id} className={`message message-${msg.role} mb-4`}>
-                {msg.role === 'system' ? (
-                  <pre className="system-message">{msg.content}</pre>
-                ) : (
-                  <div className="d-flex align-items-start">
-                    <div className="message-icon me-3">
-                      {msg.role === 'user' ? (
-                        <div className="user-icon">&gt;</div>
-                      ) : (
-                        <div className="assistant-icon">✻</div>
-                      )}
-                    </div>
-                    <div className="message-content flex-grow-1">
-                      <pre className="mb-0">{msg.content}</pre>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="message message-assistant d-flex align-items-start">
-                <div className="message-icon me-3">
-                  <div className="assistant-icon pulsing">✻</div>
-                </div>
-                <div className="message-content">
-                  <span className="thinking">Thinking...</span>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </Col>
-        </Row>
-      </div>
-
-      <div className="input-container border-top p-3">
-        <Row className="g-0">
-          <Col xs={12}>
-            <InputGroup className="input-wrapper">
-              <InputGroup.Text className="input-prompt border-0 bg-transparent">&gt;</InputGroup.Text>
-              <Form.Control
-                as="textarea"
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about your schedule or request a meeting..."
-                rows={1}
-                disabled={isLoading}
-                className="border-0 shadow-none bg-transparent"
-              />
-              <Button
-                variant="link"
-                className="send-button"
-                onClick={handleSendMessage}
-                disabled={isLoading || !input.trim()}
-                aria-label="Send message"
-              >
-                <Send size={14} />
-              </Button>
-            </InputGroup>
-            <div className="input-hint d-flex justify-content-end mt-2 small opacity-75">
-              <span className="me-3">↵ send</span>
-              <span>⇧↵ newline</span>
-            </div>
-          </Col>
-        </Row>
-      </div>
+        <Button className="p-0" onClick={handleButtonClick} id="poet">
+          <ExpertCard name="poet"/>
+        </Button>
+        <Button className="p-0" onClick={handleButtonClick} id="chess">
+          <ExpertCard name="chess"/>  
+        </Button>
+        <Button className="p-0" onClick={handleButtonClick} id="cook">
+          <ExpertCard name="cook"/>
+        </Button>
+      </Stack>
     </Container>
   );
 };
