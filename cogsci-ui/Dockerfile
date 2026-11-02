@@ -1,5 +1,5 @@
 # === STAGE 1: Build the React application ===
-FROM node:20-bookworm-slim AS builder
+FROM node:26-bookworm-slim AS builder
 
 
 # Set the working directory to `/app`
