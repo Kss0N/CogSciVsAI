@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
 import ChatInterface from "./components/ChatInterface"
+import Bongard from "./components/Bongard"
 
 function App() {
   return (<div id="app">
-    <ChatInterface />
+    {/*<ChatInterface />*/}
+    <Bongard />
   </div>)
 }
 

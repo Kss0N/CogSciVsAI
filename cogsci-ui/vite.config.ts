@@ -8,4 +8,11 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+   // ↓↓↓↓ ADD THIS ↓↓↓↓
+    resolve: {
+        alias: {
+            "@": "/public",
+            "@img": "/public/images",
+        },
+    },
 })

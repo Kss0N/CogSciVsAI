@@ -1,0 +1,24 @@
+.pin-badge {
+  position: relative;
+  border-radius: 0.5rem;
+}
+
+/* Downward-pointing arrow */
+.pin-badge::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+/* Match arrow color to Bootstrap theme colors */
+.pin-danger::after  { border-top-color: var(--bs-danger); }
+.pin-primary::after { border-top-color: var(--bs-primary); }
+.pin-success::after { border-top-color: var(--bs-success); }
+.pin-dark::after    { border-top-color: var(--bs-dark); }
+.pin-warning::after { border-top-color: var(--bs-warning); }
+.pin-info::after    { border-top-color: var(--bs-info); }
