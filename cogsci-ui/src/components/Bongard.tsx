@@ -8,31 +8,42 @@ import { Container, Row, Ratio, Col, Form, Button, InputGroup, Image, Badge } fr
 import { Stack, Card } from 'react-bootstrap';
 
 
+interface Alt {
+    left : String;
+    right : String;
+}
+interface BongardProblem {
+    image  : String;
+    alpha  : number;
+    correct : number;
+    alts   : Alt[];
+}
+
 let my_problem = {
     image : "p0001.png",
     alpha : 2.0/3,
     correct : 0,
-    alts : ["Vänster: Inget, Höger: Något", "Vänster: Små saker, Höger: Stora saker", "Vänster: Linjer, Höger: Mönster"],
-};
+    alts : [{left: "Inget", right : "Något"}, {left : "Små saker", right: "Stora saker"}, {left:"Linjer", right:"Mönster"}],
+}
 let my_problem2 = {
     image : "p0002.png",
     alpha : 3.0/3,
     correct : 2,
-    alts : ["Vänster: Ovaler, Höger: rektanglar", "Vänster: Vita former, Höger: Svarta former", "Vänster: Stora saker, Höger: små saker"],
+    alts : [{left: "Ovaler", right: "rektanglar"}, {left: "Vita former", right : "Svarta former"}, {left:"Stora saker", right:"små saker"}],
 };
 let my_problem3 = {
     image : "p0005.png",
     alpha : 2.0/3,
     correct : 0,
-    alts : ["Vänster: Hårda kanter, Höger: mjuka kanter", "Vänster: Konvexa former, Höger: konkava former", "Vänster: rektanglar, Höger: Tomt"],
+    alts : [{left: "Hårda kanter", right: "mjuka kanter"}, {left:"Konvexa former", right:"konkava former"}, {left:"rektanglar", Höger:""}],
 };
 let my_problem4 = {
     image : "p0008.png",
     alpha : 0.0/3,
     correct : 1,
-    alts : ["Vänster: Hårda kanter, Höger: mjuka kanter", "Vänster: Allt är på höger sida, Höger: Allt är på vänster sida", "Vänster: Linjer, Höger: Mönster"],
+    alts : [{left: "Hårda kanter", right: "mjuka kanter"}, {left:"Allt är på höger sida", right: "Allt är på vänster sida"}, {left: "Linjer", right: "Mönster"}],
 };
-let problems_list = [my_problem, my_problem2, my_problem3, my_problem4];
+let problems_list = [my_problem, my_problem2, my_problem3, my_problem4] as BongardProblem[];
 
 
 function getProbability(alpha : number, index : number, correct : number) : number{
@@ -90,14 +101,16 @@ function AlternativeButton({key, alt, index, onClick, variant, disabled=false, p
         onClick(index)
     }
 
-    return (<div className="p-2 text-center">
+    return (<Stack className="p-2 text-center border border-danger">
         <Pin text="AI" variant="info" visible={pinVisible} />
         <Button variant={variant} key={key} onClick={myOnClick} disabled={disabled}>
             <Card>
-                {alt}
+                Vänster: {alt.left}
+                <br/>
+                Höger: {alt.right}
             </Card>
         </Button>
-    </div>);
+    </Stack>);
 }
 
 
@@ -182,16 +195,16 @@ function Bongard() {
         
         <Stack direction="vertical" gap={2} className="margin-top-2">
             
-            <Container style={{ width: '50' }} className="border border-danger">
+            <Container style={{ width: '80%' }} className="">
                 <Ratio aspectRatio="16x9">
                     <Image src={`/images/Bongards/${problem.image}`} alt={`Bongard problem ${problem_index + 1}`} rounded/>
                 </Ratio>
             </Container>
 
-            <Stack direction="horizontal" gap={4} className="justify-content-center border border-danger">
+            <Stack direction="horizontal" gap={4} className="justify-content-center">
                 {problem.alts.map((alt, index) => (
                     <AlternativeButton 
-                        key={uuid} 
+                        key={uuid()} 
                         alt={alt}
                         index={index}
                         onClick={onButtonClick}
